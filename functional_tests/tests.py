@@ -73,9 +73,10 @@ class NewVisitorTest(LiveServerTestCase):
         ## We are going to go ahead and close user01's session so  
         ## we can see what happens with user02
         self.browser.quit()
-        self.browser.get(self.live_server_url)
+        self.browser = webdriver.Firefox() 
 
-        # user02 comes around and visits a home page, check that it's empty 
+        # user02 comes around and visits a home page, check that it's empty
+        self.browser.get(self.live_server_url) 
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
