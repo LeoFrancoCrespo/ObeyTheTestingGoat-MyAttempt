@@ -24,7 +24,7 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
-                time.sleep(0.5)
+                time.sleep(1)
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # trying to get onto homepage
