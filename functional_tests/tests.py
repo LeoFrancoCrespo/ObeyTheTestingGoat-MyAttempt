@@ -24,7 +24,7 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
-                time.sleep(1)
+                time.sleep(.5)
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # trying to get onto homepage
@@ -88,12 +88,12 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Buy milk')
 
         # check user02 has their own URL
-        user02_list_url = self.browser.find_element_by_id('id_new_item')
+        user02_list_url = self.browser.current_url
         self.assertRegex(user02_list_url, '/lists/.+')
         self.assertNotEqual(user01_list_url, user02_list_url)
 
         # do a check that user01's stuff still isn't here 
-        page_text = self.browser.find_element_by_tag_name('body').textcl
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
 
