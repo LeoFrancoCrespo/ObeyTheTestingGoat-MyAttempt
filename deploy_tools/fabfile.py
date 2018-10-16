@@ -8,7 +8,6 @@ def deploy():
     site_folder = f'/home/{env.user}/sites/{env.host}'  
     run(f'mkdir -p {site_folder}')  
     with cd(site_folder):  
-        run('pwd')
         _get_latest_source()
         _update_virtualenv()
         _create_or_update_dotenv()
@@ -21,7 +20,6 @@ def _get_latest_source():
     else:
         run(f'git clone {REPO_URL} .')  
     current_commit = local("git log -n 1 --format=%H", capture=True)  
-    print(f'state of current_commit is {current_commit}')
     run(f'git reset --hard {current_commit}')  
 
 def _update_virtualenv():
