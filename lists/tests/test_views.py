@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.utils.html import escape
+from unittest import skip
 
 from lists.forms import ItemForm, EMPTY_ITEM_ERROR
 from lists.models import Item, List
@@ -15,8 +16,6 @@ class HomePageTest(TestCase):
     def test_home_page_uses_item_form(self):
         response = self.client.get('/')
         self.assertIsInstance(response.context['form'], ItemForm)
-
-
 
 class NewListTest(TestCase):
 
@@ -54,8 +53,6 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
-
-
 class ListViewTest(TestCase):
 
     def test_uses_list_template(self):
@@ -63,20 +60,17 @@ class ListViewTest(TestCase):
         response = self.client.get(f'/lists/{list_.id}/')
         self.assertTemplateUsed(response, 'list.html')
 
-
     def test_passes_correct_list_to_template(self):
         other_list = List.objects.create()
         correct_list = List.objects.create()
         response = self.client.get(f'/lists/{correct_list.id}/')
         self.assertEqual(response.context['list'], correct_list)
 
-
     def test_displays_item_form(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
         self.assertIsInstance(response.context['form'], ItemForm)
         self.assertContains(response, 'name="text"')
-
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()
@@ -92,7 +86,6 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'itemey 2')
         self.assertNotContains(response, 'other list item 1')
         self.assertNotContains(response, 'other list item 2')
-
 
     def test_can_save_a_POST_request_to_an_existing_list(self):
         other_list = List.objects.create()
@@ -139,3 +132,17 @@ class ListViewTest(TestCase):
     def test_for_invalid_input_shows_error_on_page(self):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    @skip
+    def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1, text='textey')
+        response = self.client.post(
+            f'/lists/{list1.id}/',
+            data={'text': 'textey'}
+        )
+
+        expected_error = escape("You've already got this in your list")
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
