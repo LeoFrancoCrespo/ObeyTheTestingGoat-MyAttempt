@@ -24,7 +24,10 @@ class LoginTest(FunctionalTest):
         inbox  = poplib.POP3_SSL('pop.gmail.com')
         try:
             inbox.user(test_email)
-            inbox.pass_(os.environ.get('GMAIL_PASSWORD'))
+            passwd=os.environ.get('GMAIL_PASSWORD')
+            if passwd is None:
+                self.fail('passwd field not initialized')
+            inbox.pass_(passwd)
             while time.time() - start < 60:
                 count, _ = inbox.stat()
                 for i in reversed(range(max(1, count - 10), count + 1)):
@@ -49,7 +52,6 @@ class LoginTest(FunctionalTest):
             test_email = 'leofcrespo.projectManager@gmail.com'
         else: 
             test_email = 'edith@example.com'
-        
         
         self.browser.get(self.live_server_url)
         self.browser.find_element_by_name('email').send_keys(test_email)
